@@ -19,27 +19,33 @@ def get_headers(event):
     return headers
 
 
-
 def lambda_handler(event, context):
     method = get_method(event)
+    headers = get_headers(event)
     if method == 'OPTIONS':
         return {
             'statusCode': 200,
             'headers': {
-                "Access-Control-Allow-Origin": "*",
-                "Access-Control-Allow-Headers": "Content-Type"
+                "Access-Control-Allow-Origin": '*',
+                'Access-Control-Allow-Headers': '*'
             },
         }
 
-    headers = get_headers(event)
     url = get_path(event)
+
+    #
+    # Need to extract Cookie as XCookie because browser refuses to pass Cookie
+    #
+    headers['Cookie'] = headers['xcookie']
+    del headers['xcookie']
+
     response = requests.get(url, headers=headers)
 
     return {
         'statusCode': 200,
         'headers': {
-            "Access-Control-Allow-Origin": "*",
-            "Access-Control-Allow-Headers": "Content-Type"
+            "Access-Control-Allow-Origin": '*',
+            'Access-Control-Allow-Headers': '*'
         },
         'body': response.text
     }
